@@ -16,13 +16,14 @@ function weather_widget_register_settings()
   $options = [
     'api_key' => '',
     'zipcode' => '',
-    'style' => 'light',
     'temp' => 'on',
     'desc' => 'on',
     'humidity' => '',
     'wind_speed' => '',
     'pressure' => '',
-    'visibility' => ''
+    'visibility' => '',
+    'style' => 'light',
+    'rounded_corners' => 'off'
   ];
 
   foreach ($options as $name => $default) {
@@ -64,25 +65,45 @@ function weather_widget_options_page()
       <h3>Default ZIP Code</h3>
       <input type="text" id="weather_widget_option_zipcode" name="weather_widget_option_zipcode" value="<?php echo get_option('weather_widget_option_zipcode'); ?>" />
       <h3>Display Options</h3>
-      <input type="checkbox" id="weather_widget_option_temp" name="weather_widget_option_temp" <?php checked(get_option('weather_widget_option_temp'), 'on'); ?> />
-      <label for="weather_widget_option_temp">Temperature</label><br />
-      <input type="checkbox" id="weather_widget_option_desc" name="weather_widget_option_desc" <?php checked(get_option('weather_widget_option_desc'), 'on'); ?> />
-      <label for="weather_widget_option_desc">Description</label><br />
-      <input type="checkbox" id="weather_widget_option_humidity" name="weather_widget_option_humidity" <?php checked(get_option('weather_widget_option_humidity'), 'on'); ?> />
-      <label for="weather_widget_option_humidity">Humidity</label><br />
-      <input type="checkbox" id="weather_widget_option_wind_speed" name="weather_widget_option_wind_speed" <?php checked(get_option('weather_widget_option_wind_speed'), 'on'); ?> />
-      <label for="weather_widget_option_wind_speed">Wind Speed</label><br />
-      <input type="checkbox" id="weather_widget_option_pressure" name="weather_widget_option_pressure" <?php checked(get_option('weather_widget_option_pressure'), 'on'); ?> />
-      <label for="weather_widget_option_pressure">Pressure</label><br />
-      <input type="checkbox" id="weather_widget_option_visibility" name="weather_widget_option_visibility" <?php checked(get_option('weather_widget_option_visibility'), 'on'); ?> />
-      <label for="weather_widget_option_visibility">Visibility</label><br />
+      <div style="display:inline-flex;flex-direction:column;gap:1rem;">
+        <div>
+          <input type="checkbox" id="weather_widget_option_temp" name="weather_widget_option_temp" <?php checked(get_option('weather_widget_option_temp'), 'on'); ?> />
+          <label style="margin:auto;" for="weather_widget_option_temp">Temperature</label><br />
+        </div>
+        <div>
+          <input type="checkbox" id="weather_widget_option_desc" name="weather_widget_option_desc" <?php checked(get_option('weather_widget_option_desc'), 'on'); ?> />
+          <label style="margin:auto;" for="weather_widget_option_desc">Description</label><br />
+        </div>
+        <div>
+          <input type="checkbox" id="weather_widget_option_humidity" name="weather_widget_option_humidity" <?php checked(get_option('weather_widget_option_humidity'), 'on'); ?> />
+          <label style="margin:auto;" for="weather_widget_option_humidity">Humidity</label><br />
+        </div>
+        <div>
+          <input type="checkbox" id="weather_widget_option_wind_speed" name="weather_widget_option_wind_speed" <?php checked(get_option('weather_widget_option_wind_speed'), 'on'); ?> />
+          <label style="margin:auto;" for="weather_widget_option_wind_speed">Wind Speed</label><br />
+        </div>
+        <div>
+          <input type="checkbox" id="weather_widget_option_pressure" name="weather_widget_option_pressure" <?php checked(get_option('weather_widget_option_pressure'), 'on'); ?> />
+          <label style="margin:auto;" for="weather_widget_option_pressure">Pressure</label><br />
+        </div>
+        <div>
+          <input type="checkbox" id="weather_widget_option_visibility" name="weather_widget_option_visibility" <?php checked(get_option('weather_widget_option_visibility'), 'on'); ?> />
+          <label style="margin:auto;" for="weather_widget_option_visibility">Visibility</label><br />
+        </div>
+      </div>
       <h3>Style</h3>
-      <select id="weather_widget_option_style" name="weather_widget_option_style">
-        <option value="light" <?php selected(get_option('weather_widget_option_style'), 'light'); ?>>Light</option>
-        <option value="dark" <?php selected(get_option('weather_widget_option_style'), 'dark'); ?>>Dark</option>
-        <option value="compact-light" <?php selected(get_option('weather_widget_option_style'), 'compact-light'); ?>>Compact Light</option>
-        <option value="compact-dark" <?php selected(get_option('weather_widget_option_style'), 'compact-dark'); ?>>Compact Dark</option>
-      </select>
+      <div style="display:inline-flex;flex-direction:column;gap:1rem;">
+        <select id="weather_widget_option_style" name="weather_widget_option_style">
+          <option value="light" <?php selected(get_option('weather_widget_option_style'), 'light'); ?>>Light</option>
+          <option value="dark" <?php selected(get_option('weather_widget_option_style'), 'dark'); ?>>Dark</option>
+          <option value="compact-light" <?php selected(get_option('weather_widget_option_style'), 'compact-light'); ?>>Compact Light</option>
+          <option value="compact-dark" <?php selected(get_option('weather_widget_option_style'), 'compact-dark'); ?>>Compact Dark</option>
+        </select>
+        <div>
+          <input type="checkbox" id="weather_widget_option_rounded_corners" name="weather_widget_option_rounded_corners" <?php checked(get_option('weather_widget_option_rounded_corners'), 'on'); ?> />
+          <label style="margin:auto;" for="weather_widget_option_rounded_corners">Rounded Corners</label><br />
+        </div>
+      </div>
       <?php submit_button(); ?>
     </form>
   </div>
@@ -135,7 +156,13 @@ class OpenWeatherMap_Widget extends WP_Widget
 
       echo $args['before_widget'];
       echo $args['before_title'] . 'Weather' . $args['after_title'];
-      echo "<div class='weather-widget-content'>";
+
+      $style = '';
+      if (get_option('weather_widget_option_rounded_corners') === 'on') {
+        $style = ' style="border-radius: 10px;"';
+      }
+
+      echo "<div class='weather-widget-content'$style>";
 
       $icon_id = $data->weather[0]->icon;
       $icon_url = "http://openweathermap.org/img/w/{$icon_id}.png";
@@ -161,7 +188,7 @@ class OpenWeatherMap_Widget extends WP_Widget
     $zipcode = !empty($instance['zipcode']) ? $instance['zipcode'] : esc_html__('', 'text_domain');
   ?>
     <p>
-      <label for="<?php echo esc_attr($this->get_field_id('zipcode')); ?>"><?php esc_attr_e('ZIP Code:', 'text_domain'); ?></label>
+      <label style="margin:auto;" for="<?php echo esc_attr($this->get_field_id('zipcode')); ?>"><?php esc_attr_e('ZIP Code:', 'text_domain'); ?></label>
       <input class="widefat" id="<?php echo esc_attr($this->get_field_id('zipcode')); ?>" name="<?php echo esc_attr($this->get_field_name('zipcode')); ?>" type="text" value="<?php echo esc_attr(sanitize_text_field($zipcode)); ?>">
     </p>
 <?php
