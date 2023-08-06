@@ -48,64 +48,74 @@ function weather_widget_register_options_page()
 add_action('admin_menu', 'weather_widget_register_options_page');
 
 /**
- * Renders the OpenWeatherMap Widget settings page, 
+ * Renders the OpenWeatherMap Widget settings page,
  * providing form fields for all the settings and allowing the user to update them.
  */
 function weather_widget_options_page()
 {
+  $options = [
+    'general' => [
+      'title' => 'General Settings',
+      'api_key' => ['API Key', 'text', '', 'You can register for a free API key on <a href="http://openweathermap.org/appid" target="_blank">OpenWeatherMap\'s website</a>.'],
+      'zipcode' => ['Default ZIP Code', 'text', ''],
+    ],
+    'weather' => [
+      'title' => 'Weather Options',
+      'temp' => ['Temperature', 'checkbox', 'off'],
+      'desc' => ['Description', 'checkbox', 'off'],
+      'humidity' => ['Humidity', 'checkbox', 'off'],
+      'wind_speed' => ['Wind Speed', 'checkbox', 'off'],
+      'pressure' => ['Pressure', 'checkbox', 'off'],
+      'visibility' => ['Visibility', 'checkbox', 'off'],
+    ],
+    'style' => [
+      'title' => 'Style Settings',
+      'style' => ['Style', 'select', [
+        'light' => 'Light',
+        'dark' => 'Dark',
+        'compact-light' => 'Compact Light',
+        'compact-dark' => 'Compact Dark',
+      ], 'light'],
+      'rounded_corners' => ['Rounded Corners', 'checkbox', 'off'],
+    ]
+  ];
 ?>
   <div>
     <h2>OpenWeatherMap Widget Settings</h2>
     <form method="post" action="options.php">
       <?php settings_fields('weather_widget_options_group'); ?>
-      <?php settings_fields('weather_widget_options_group'); ?>
-      <h3>API Key</h3>
-      <input type="text" id="weather_widget_option_api_key" name="weather_widget_option_api_key" value="<?php echo get_option('weather_widget_option_api_key'); ?>" />
-      <p class="description">
-        <a href="https://home.openweathermap.org/users/sign_up" target="_blank">Register an account</a> with OpenWeatherMap to get your API key.
-      </p>
-      <h3>Default ZIP Code</h3>
-      <input type="text" id="weather_widget_option_zipcode" name="weather_widget_option_zipcode" value="<?php echo get_option('weather_widget_option_zipcode'); ?>" />
-      <h3>Display Options</h3>
-      <div style="display:inline-flex;flex-direction:column;gap:1rem;">
-        <div>
-          <input type="checkbox" id="weather_widget_option_temp" name="weather_widget_option_temp" <?php checked(get_option('weather_widget_option_temp'), 'on'); ?> />
-          <label style="margin:auto;" for="weather_widget_option_temp">Temperature</label><br />
-        </div>
-        <div>
-          <input type="checkbox" id="weather_widget_option_desc" name="weather_widget_option_desc" <?php checked(get_option('weather_widget_option_desc'), 'on'); ?> />
-          <label style="margin:auto;" for="weather_widget_option_desc">Description</label><br />
-        </div>
-        <div>
-          <input type="checkbox" id="weather_widget_option_humidity" name="weather_widget_option_humidity" <?php checked(get_option('weather_widget_option_humidity'), 'on'); ?> />
-          <label style="margin:auto;" for="weather_widget_option_humidity">Humidity</label><br />
-        </div>
-        <div>
-          <input type="checkbox" id="weather_widget_option_wind_speed" name="weather_widget_option_wind_speed" <?php checked(get_option('weather_widget_option_wind_speed'), 'on'); ?> />
-          <label style="margin:auto;" for="weather_widget_option_wind_speed">Wind Speed</label><br />
-        </div>
-        <div>
-          <input type="checkbox" id="weather_widget_option_pressure" name="weather_widget_option_pressure" <?php checked(get_option('weather_widget_option_pressure'), 'on'); ?> />
-          <label style="margin:auto;" for="weather_widget_option_pressure">Pressure</label><br />
-        </div>
-        <div>
-          <input type="checkbox" id="weather_widget_option_visibility" name="weather_widget_option_visibility" <?php checked(get_option('weather_widget_option_visibility'), 'on'); ?> />
-          <label style="margin:auto;" for="weather_widget_option_visibility">Visibility</label><br />
-        </div>
-      </div>
-      <h3>Style</h3>
-      <div style="display:inline-flex;flex-direction:column;gap:1rem;">
-        <select id="weather_widget_option_style" name="weather_widget_option_style">
-          <option value="light" <?php selected(get_option('weather_widget_option_style'), 'light'); ?>>Light</option>
-          <option value="dark" <?php selected(get_option('weather_widget_option_style'), 'dark'); ?>>Dark</option>
-          <option value="compact-light" <?php selected(get_option('weather_widget_option_style'), 'compact-light'); ?>>Compact Light</option>
-          <option value="compact-dark" <?php selected(get_option('weather_widget_option_style'), 'compact-dark'); ?>>Compact Dark</option>
-        </select>
-        <div>
-          <input type="checkbox" id="weather_widget_option_rounded_corners" name="weather_widget_option_rounded_corners" <?php checked(get_option('weather_widget_option_rounded_corners'), 'on'); ?> />
-          <label style="margin:auto;" for="weather_widget_option_rounded_corners">Rounded Corners</label><br />
-        </div>
-      </div>
+      <?php do_settings_sections('weather_widget_options_group'); ?>
+
+      <?php foreach ($options as $group => $groupData) : ?>
+        <h3><?php echo $groupData['title']; ?></h3>
+        <?php foreach ($groupData as $option => $value) : ?>
+          <?php if ($option === 'title') continue; ?>
+          <?php
+          $label = $value[0];
+          $type = $value[1];
+          $default = $value[2];
+          $note = isset($value[3]) ? $value[3] : '';
+          ?>
+          <p>
+            <label for="weather_widget_option_<?php echo $option; ?>"><?php echo $label; ?></label>
+            <?php if ($type === 'text') : ?>
+              <input type="text" id="weather_widget_option_<?php echo $option; ?>" name="weather_widget_option_<?php echo $option; ?>" value="<?php echo get_option("weather_widget_option_$option", $default); ?>" />
+            <?php elseif ($type === 'checkbox') : ?>
+              <input type="checkbox" id="weather_widget_option_<?php echo $option; ?>" name="weather_widget_option_<?php echo $option; ?>" <?php checked(get_option("weather_widget_option_$option", $default), 'on'); ?> />
+            <?php elseif ($type === 'select') : ?>
+              <select id="weather_widget_option_<?php echo $option; ?>" name="weather_widget_option_<?php echo $option; ?>">
+                <?php foreach ($value[2] as $optValue => $optLabel) : ?>
+                  <option value="<?php echo $optValue; ?>" <?php selected(get_option("weather_widget_option_$option", $default), $optValue); ?>><?php echo $optLabel; ?></option>
+                <?php endforeach; ?>
+              </select>
+            <?php endif; ?>
+            <?php if ($note) : ?>
+              <small><?php echo $note; ?></small>
+            <?php endif; ?>
+          </p>
+        <?php endforeach; ?>
+      <?php endforeach; ?>
+
       <?php submit_button(); ?>
     </form>
   </div>
@@ -238,6 +248,5 @@ function enqueue_openweathermap_widget_styles()
   $style = get_option('weather_widget_option_style', 'light');
   wp_enqueue_style('openweathermap-widget', plugin_dir_url(__FILE__) . "assets/css/{$style}.css");
 }
-
 
 add_action('wp_enqueue_scripts', 'enqueue_openweathermap_widget_styles');
