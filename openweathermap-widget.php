@@ -28,12 +28,11 @@ function weather_widget_register_settings()
 
   foreach ($options as $name => $default) {
     $option_name = "weather_widget_option_$name";
-    if (false === get_option($option_name)) {
-      add_option($option_name, sanitize_text_field($default));
-    }
+    add_option($option_name, sanitize_text_field($default));
     register_setting('weather_widget_options_group', $option_name);
   }
 }
+
 
 add_action('admin_init', 'weather_widget_register_settings');
 
@@ -143,12 +142,8 @@ class OpenWeatherMap_Widget extends WP_Widget
     $api_key = get_option('weather_widget_option_api_key');
     $api_url = "http://api.openweathermap.org/data/2.5/weather?zip={$zipcode}&units=imperial&appid={$api_key}";
     $response = wp_remote_get($api_url);
-    if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
-      error_log($response->get_error_message());
-      return;
-    }
 
-    if (is_wp_error($response)) {
+    if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
       error_log($response->get_error_message());
       return;
     }
