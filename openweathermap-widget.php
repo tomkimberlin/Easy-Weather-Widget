@@ -28,7 +28,9 @@ function weather_widget_register_settings()
 
   foreach ($options as $name => $default) {
     $option_name = "weather_widget_option_$name";
-    add_option($option_name, sanitize_text_field($default));
+    if (false === get_option($option_name)) {
+      add_option($option_name, sanitize_text_field($default));
+    }
     register_setting('weather_widget_options_group', $option_name);
   }
 }
