@@ -1,0 +1,20 @@
+.weather-widget-content {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  background-color: #333;
+  color: #fff;
+  display: inline-flex;
+  flex-direction: column;
+  font-size: 1rem;
+}
+
+.weather-widget-content .weather-icon {
+  display: block;
+  margin: auto;
+  max-width: 100%;
+}
+
+.weather-widget-content .weather-data strong {
+  font-weight: bold;
+  color: #fff;
+}
