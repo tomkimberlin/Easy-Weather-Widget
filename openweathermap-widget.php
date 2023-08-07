@@ -16,6 +16,7 @@ function weather_widget_register_settings()
   $options = [
     'api_key' => '',
     'zipcode' => '',
+    'show_city' => 'on',
     'temp' => 'on',
     'feels_like' => 'on',
     'summary' => 'on',
@@ -62,6 +63,7 @@ function weather_widget_options_page()
     ],
     'weather' => [
       'title' => 'Weather Options',
+      'show_city' => ['Show City', 'checkbox', 'on'],
       'temp' => ['Temperature', 'checkbox', 'on'],
       'feels_like' => ['Feels Like', 'checkbox', 'on'],
       'summary' => ['Summary', 'checkbox', 'on'],
@@ -156,6 +158,7 @@ class OpenWeatherMap_Widget extends WP_Widget
     $data = json_decode($body);
 
     if (!empty($data)) {
+      $city_name = $data->name; // Get the city name
       $weather_data = [
         'temp' => ['Temperature', "{$data->main->temp}°F"],
         'feels_like' => ['Feels Like', "{$data->main->feels_like}°F"],
@@ -180,6 +183,11 @@ class OpenWeatherMap_Widget extends WP_Widget
       $icon_id = $data->weather[0]->icon;
       $icon_url = "http://openweathermap.org/img/w/{$icon_id}.png";
       echo "<img class='weather-icon' src='{$icon_url}' alt='Weather icon' />";
+
+      // Check the 'show_city' option and display city name
+      if (get_option('weather_widget_option_show_city') === 'on') {
+        echo "<p class='weather-city'><strong>City:</strong> {$city_name}</p>";
+      }
 
       foreach ($weather_data as $key => $info) {
         if (get_option("weather_widget_option_$key") === 'on') {
