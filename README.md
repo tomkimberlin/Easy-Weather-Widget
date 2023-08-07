@@ -19,6 +19,14 @@ Once installed and activated, configure the OpenWeatherMap Widget using the foll
 4. Drag and drop the "OpenWeatherMap Widget" into your desired widget area.
 5. The widget should now appear on your site, displaying the weather for the configured ZIP code.
 
+## Screenshots
+
+Because a picture is worth a thousand words.
+
+![Widget](/assets/screenshots/widget.png)
+
+![Widget Settings](/assets/screenshots/settings.png)
+
 ## Features
 
 The OpenWeatherMap Widget allows you to:
