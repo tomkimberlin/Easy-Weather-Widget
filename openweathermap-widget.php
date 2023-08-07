@@ -16,7 +16,7 @@ function weather_widget_register_settings()
   $options = [
     'api_key' => '',
     'zipcode' => '',
-    'units' => 'standard',
+    'units' => 'imperial',
     'show_city' => 'on',
     'temp' => 'on',
     'feels_like' => 'on',
@@ -126,9 +126,10 @@ function weather_widget_options_page()
       // Check if API Key and ZIP code are not empty
       $api_key = get_option('weather_widget_option_api_key');
       $zipcode = get_option('weather_widget_option_zipcode');
-      if (empty($api_key) || empty($zipcode)) {
-        echo '<p style="color:red;">Both API Key and ZIP code are required for the widget to function correctly.</p>';
+      if (empty($api_key) || empty($zipcode) || !preg_match('/^\d{5}$/', $zipcode)) {
+        echo '<p style="color:red;">API Key and a valid 5-digit ZIP code are required for the widget to function correctly.</p>';
       }
+
       ?>
 
       <?php submit_button(); ?>
@@ -177,8 +178,30 @@ class OpenWeatherMap_Widget extends WP_Widget
     $api_url = "http://api.openweathermap.org/data/2.5/weather?zip={$zipcode}&units={$units}&appid={$api_key}";
     $response = wp_remote_get($api_url);
 
-    if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
-      error_log($response->get_error_message());
+    if (is_wp_error($response)) {
+      echo $args['before_widget'];
+      echo $args['before_title'] . 'Weather' . $args['after_title'];
+      echo "<p>An error occurred while retrieving the weather information. Please check your settings.</p>";
+      echo $args['after_widget'];
+      return;
+    }
+
+    if (wp_remote_retrieve_response_code($response) != 200) {
+      $body = wp_remote_retrieve_body($response);
+      $data = json_decode($body);
+
+      echo $args['before_widget'];
+      echo $args['before_title'] . 'Weather' . $args['after_title'];
+
+      if ($data->cod == 401) {
+        echo "<p>Your API Key is not valid. Please check it in the settings.</p>";
+      } else if ($data->cod == 404) {
+        echo "<p>The ZIP Code is not valid. Please check it in the settings.</p>";
+      } else {
+        echo "<p>An unknown error occurred. Please check your settings.</p>";
+      }
+
+      echo $args['after_widget'];
       return;
     }
 
@@ -245,6 +268,7 @@ class OpenWeatherMap_Widget extends WP_Widget
     <p>
       <label style="margin:auto;" for="<?php echo esc_attr($this->get_field_id('zipcode')); ?>"><?php esc_attr_e('ZIP Code:', 'text_domain'); ?></label>
       <input class="widefat" id="<?php echo esc_attr($this->get_field_id('zipcode')); ?>" name="<?php echo esc_attr($this->get_field_name('zipcode')); ?>" type="text" value="<?php echo esc_attr(sanitize_text_field($zipcode)); ?>">
+      <small id="zipcode-error" style="color:red; display: none;">Invalid ZIP code. Please enter a 5-digit ZIP code.</small>
     </p>
 <?php
   }
@@ -256,10 +280,13 @@ class OpenWeatherMap_Widget extends WP_Widget
   {
     $instance = array();
     $zipcode = (!empty($new_instance['zipcode'])) ? strip_tags($new_instance['zipcode']) : '';
-    $instance['zipcode'] = $zipcode;
 
-    // Add this to update the widget option
-    update_option('weather_widget_option_zipcode', sanitize_text_field($zipcode));
+    if (preg_match('/^\d{5}$/', $zipcode)) {
+      $instance['zipcode'] = $zipcode;
+
+      // Add this to update the widget option
+      update_option('weather_widget_option_zipcode', sanitize_text_field($zipcode));
+    }
 
     return $instance;
   }
