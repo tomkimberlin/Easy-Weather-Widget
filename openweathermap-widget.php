@@ -16,6 +16,7 @@ function weather_widget_register_settings()
   $options = [
     'api_key' => '',
     'zipcode' => '',
+    'units' => 'standard',
     'show_city' => 'on',
     'temp' => 'on',
     'feels_like' => 'on',
@@ -58,8 +59,13 @@ function weather_widget_options_page()
   $options = [
     'general' => [
       'title' => 'General Settings',
-      'api_key' => ['API Key', 'text', '', 'You can register for a free API key on <a href="http://openweathermap.org/register" target="_blank">OpenWeatherMap\'s website</a>.'],
+      'api_key' => ['API Key', 'text', '', 'You can register for a free API key on <a href="http://openweathermap.org/appid" target="_blank">OpenWeatherMap\'s website</a>.'],
       'zipcode' => ['Default ZIP Code', 'text', ''],
+      'units' => ['Units of Measurement', 'select', [
+        'standard' => 'Standard',
+        'metric' => 'Metric',
+        'imperial' => 'Imperial',
+      ]],
     ],
     'weather' => [
       'title' => 'Weather Options',
@@ -142,7 +148,8 @@ class OpenWeatherMap_Widget extends WP_Widget
   {
     $zipcode = !empty($instance['zipcode']) ? $instance['zipcode'] : get_option('weather_widget_option_zipcode');
     $api_key = get_option('weather_widget_option_api_key');
-    $api_url = "http://api.openweathermap.org/data/2.5/weather?zip={$zipcode}&units=imperial&appid={$api_key}";
+    $units = get_option('weather_widget_option_units');  // get units setting
+    $api_url = "http://api.openweathermap.org/data/2.5/weather?zip={$zipcode}&units={$units}&appid={$api_key}";  // use units in API request
     $response = wp_remote_get($api_url);
 
     if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
@@ -155,15 +162,22 @@ class OpenWeatherMap_Widget extends WP_Widget
 
     if (!empty($data)) {
       $city_name = $data->name;
+
+      // Adjust weather data rendering based on units
+      $temp_unit = $units === 'metric' ? '°C' : '°F';
+      $wind_speed_unit = $units === 'metric' ? 'meter/sec' : 'miles/hour';
+      $pressure_unit = $units === 'imperial' ? 'inHg' : 'hPa';
+      $visibility_unit = $units === 'imperial' ? 'miles' : 'meters';
+
       $weather_data = [
-        'temp' => ['Temperature', "{$data->main->temp}°F"],
-        'feels_like' => ['Feels Like', "{$data->main->feels_like}°F"],
+        'temp' => ['Temperature', "{$data->main->temp}$temp_unit"],
+        'feels_like' => ['Feels Like', "{$data->main->feels_like}$temp_unit"],
         'summary' => ['Summary', $data->weather[0]->main],
         'desc' => ['Description', $this->to_capitalized_case($data->weather[0]->description)],
         'humidity' => ['Humidity', "{$data->main->humidity}%"],
-        'wind_speed' => ['Wind Speed', "{$data->wind->speed} m/s"],
-        'pressure' => ['Pressure', number_format($data->main->pressure) . " hPa"],
-        'visibility' => ['Visibility', number_format($data->visibility) . " m"]
+        'wind_speed' => ['Wind Speed', "{$data->wind->speed} $wind_speed_unit"],
+        'pressure' => ['Pressure', number_format($data->main->pressure) . " $pressure_unit"],
+        'visibility' => ['Visibility', number_format($data->visibility) . " $visibility_unit"]
       ];
 
       echo $args['before_widget'];
