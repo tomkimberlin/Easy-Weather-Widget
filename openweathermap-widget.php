@@ -25,7 +25,7 @@ function weather_widget_register_settings()
     'wind_speed' => '',
     'pressure' => '',
     'visibility' => '',
-    'style' => 'light',
+    'style' => 'default',
     'rounded_corners' => 'off'
   ];
 
@@ -154,7 +154,7 @@ class OpenWeatherMap_Widget extends WP_Widget
     $data = json_decode($body);
 
     if (!empty($data)) {
-      $city_name = $data->name; // Get the city name
+      $city_name = $data->name;
       $weather_data = [
         'temp' => ['Temperature', "{$data->main->temp}°F"],
         'feels_like' => ['Feels Like', "{$data->main->feels_like}°F"],
@@ -272,7 +272,7 @@ function fetch_css_files()
  */
 function enqueue_openweathermap_widget_styles()
 {
-  $style = get_option('weather_widget_option_style', 'light');
+  $style = get_option('weather_widget_option_style', 'default');
   wp_enqueue_style('openweathermap-widget', plugin_dir_url(__FILE__) . "assets/css/{$style}.css");
 }
 
