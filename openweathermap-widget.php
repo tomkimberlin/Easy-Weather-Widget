@@ -190,7 +190,7 @@ class OpenWeatherMap_Widget extends WP_Widget
       $city_name = $data->name;
 
       // Adjust weather data rendering based on units
-      $temp_unit = $units === 'metric' ? '°C' : '°F';
+      $temp_unit = $units === 'metric' ? '°C' : ($units === 'standard' ? 'K' : '°F');
       $wind_speed_unit = $units === 'metric' ? 'meter/sec' : 'miles/hour';
       $pressure_unit = $units === 'imperial' ? 'inHg' : 'hPa';
       $visibility_unit = $units === 'imperial' ? 'miles' : 'meters';
