@@ -1,8 +1,4 @@
 .weather-widget-content {
-  border: 1px solid #ccc;
-  padding: 1rem;
-  background-color: #fff;
-  color: #333;
   display: inline-flex;
   flex-direction: column;
   font-size: 1.125rem;
@@ -12,8 +8,4 @@
   display: block;
   margin: auto;
   max-width: 100%;
-}
-
-.weather-widget-content .weather-data strong {
-  color: #333;
 }

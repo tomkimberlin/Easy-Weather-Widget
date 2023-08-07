@@ -58,7 +58,7 @@ function weather_widget_options_page()
   $options = [
     'general' => [
       'title' => 'General Settings',
-      'api_key' => ['API Key', 'text', '', 'You can register for a free API key on <a href="http://openweathermap.org/appid" target="_blank">OpenWeatherMap\'s website</a>.'],
+      'api_key' => ['API Key', 'text', '', 'You can register for a free API key on <a href="http://openweathermap.org/register" target="_blank">OpenWeatherMap\'s website</a>.'],
       'zipcode' => ['Default ZIP Code', 'text', ''],
     ],
     'weather' => [
@@ -75,15 +75,11 @@ function weather_widget_options_page()
     ],
     'style' => [
       'title' => 'Style Settings',
-      'style' => ['Style', 'select', [
-        'light' => 'Light',
-        'dark' => 'Dark',
-        'compact-light' => 'Compact Light',
-        'compact-dark' => 'Compact Dark',
-      ], 'light'],
+      'style' => ['Style', 'select', array_combine(fetch_css_files(), fetch_css_files())],
       'rounded_corners' => ['Rounded Corners', 'checkbox', 'off'],
     ]
   ];
+
 ?>
   <div>
     <h2>OpenWeatherMap Widget Settings</h2>
@@ -253,6 +249,23 @@ function openweathermap_widget_plugin_settings_link($links)
 
 $plugin = plugin_basename(__FILE__);
 add_filter("plugin_action_links_$plugin", 'openweathermap_widget_plugin_settings_link');
+
+/**
+ * Fetch all CSS files from the assets/css directory.
+ */
+function fetch_css_files()
+{
+  $css_dir = plugin_dir_path(__FILE__) . 'assets/css/';
+  $css_files = array();
+
+  if (is_dir($css_dir)) {
+    foreach (glob($css_dir . '*.css') as $file) {
+      $css_files[] = basename($file, '.css');
+    }
+  }
+
+  return $css_files;
+}
 
 /**
  * Enqueues the stylesheet for the OpenWeatherMap Widget.
