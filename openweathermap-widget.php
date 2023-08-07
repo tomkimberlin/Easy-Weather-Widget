@@ -18,6 +18,7 @@ function weather_widget_register_settings()
     'country_code' => 'us',
     'zipcode' => '',
     'units' => 'imperial',
+    'round_data' => 'on',
     'show_city' => 'on',
     'temp' => 'on',
     'feels_like' => 'on',
@@ -90,6 +91,7 @@ function weather_widget_options_page()
         'metric' => 'Metric',
         'imperial' => 'Imperial',
       ]],
+      'round_data' => ['Round Weather Data', 'checkbox', 'off']
     ],
     'weather' => [
       'title' => 'Weather Options',
@@ -243,13 +245,16 @@ class OpenWeatherMap_Widget extends WP_Widget
       $pressure_unit = $units === 'imperial' ? 'inHg' : 'hPa';
       $visibility_unit = $units === 'imperial' ? 'miles' : 'meters';
 
+      $should_round = get_option('weather_widget_option_round_data') === 'on';
+
+
       $weather_data = [
-        'temp' => ['Temperature', "{$data->main->temp}$temp_unit"],
-        'feels_like' => ['Feels Like', "{$data->main->feels_like}$temp_unit"],
+        'temp' => ['Temperature', ($should_round ? round($data->main->temp) : $data->main->temp) . $temp_unit],
+        'feels_like' => ['Feels Like', ($should_round ? round($data->main->feels_like) : $data->main->feels_like) . $temp_unit],
         'summary' => ['Summary', $data->weather[0]->main],
         'desc' => ['Description', ucwords(strtolower($data->weather[0]->description))],
         'humidity' => ['Humidity', "{$data->main->humidity}%"],
-        'wind_speed' => ['Wind Speed', "{$data->wind->speed} $wind_speed_unit"],
+        'wind_speed' => ['Wind Speed', ($should_round ? round($data->wind->speed) : $data->wind->speed) . " $wind_speed_unit"],
         'pressure' => ['Pressure', number_format($data->main->pressure) . " $pressure_unit"],
         'visibility' => ['Visibility', number_format($data->visibility) . " $visibility_unit"]
       ];
