@@ -60,7 +60,7 @@ function weather_widget_options_page()
     'general' => [
       'title' => 'General Settings',
       'api_key' => ['API Key', 'text', '', 'You can register for a free API key on <a href="http://openweathermap.org/appid" target="_blank">OpenWeatherMap\'s website</a>.'],
-      'zipcode' => ['Default ZIP Code', 'text', ''],
+      'zipcode' => ['ZIP Code', 'text', ''],
       'units' => ['Units of Measurement', 'select', [
         'standard' => 'Standard',
         'metric' => 'Metric',
@@ -123,6 +123,15 @@ function weather_widget_options_page()
         <?php endforeach; ?>
       <?php endforeach; ?>
 
+      <?php
+      // Check if API Key and ZIP code are not empty
+      $api_key = get_option('weather_widget_option_api_key');
+      $zipcode = get_option('weather_widget_option_zipcode');
+      if (empty($api_key) || empty($zipcode)) {
+        echo '<p style="color:red;">Both API Key and ZIP code are required for the widget to function correctly.</p>';
+      }
+      ?>
+
       <?php submit_button(); ?>
     </form>
   </div>
@@ -146,10 +155,27 @@ class OpenWeatherMap_Widget extends WP_Widget
    */
   public function widget($args, $instance)
   {
-    $zipcode = !empty($instance['zipcode']) ? $instance['zipcode'] : get_option('weather_widget_option_zipcode');
+    $zipcode = get_option('weather_widget_option_zipcode');
     $api_key = get_option('weather_widget_option_api_key');
-    $units = get_option('weather_widget_option_units');  // get units setting
-    $api_url = "http://api.openweathermap.org/data/2.5/weather?zip={$zipcode}&units={$units}&appid={$api_key}";  // use units in API request
+    $units = get_option('weather_widget_option_units');
+
+    if (empty($api_key)) {
+      echo $args['before_widget'];
+      echo $args['before_title'] . 'Weather' . $args['after_title'];
+      echo "<p>Please provide your OpenWeatherMap API key in the plugin settings.</p>";
+      echo $args['after_widget'];
+      return;
+    }
+
+    if (empty($zipcode)) {
+      echo $args['before_widget'];
+      echo $args['before_title'] . 'Weather' . $args['after_title'];
+      echo "<p>Please provide a ZIP code in the widget settings or the plugin settings.</p>";
+      echo $args['after_widget'];
+      return;
+    }
+
+    $api_url = "http://api.openweathermap.org/data/2.5/weather?zip={$zipcode}&units={$units}&appid={$api_key}";
     $response = wp_remote_get($api_url);
 
     if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
@@ -194,7 +220,6 @@ class OpenWeatherMap_Widget extends WP_Widget
       $icon_url = "http://openweathermap.org/img/w/{$icon_id}.png";
       echo "<img class='weather-icon' src='{$icon_url}' alt='Weather icon' />";
 
-      // Check the 'show_city' option and display city name
       if (get_option('weather_widget_option_show_city') === 'on') {
         echo "<p class='weather-city'><strong>City:</strong> {$city_name}</p>";
       }
@@ -231,9 +256,15 @@ class OpenWeatherMap_Widget extends WP_Widget
   public function update($new_instance, $old_instance)
   {
     $instance = array();
-    $instance['zipcode'] = (!empty($new_instance['zipcode'])) ? strip_tags($new_instance['zipcode']) : '';
+    $zipcode = (!empty($new_instance['zipcode'])) ? strip_tags($new_instance['zipcode']) : '';
+    $instance['zipcode'] = $zipcode;
+
+    // Add this to update the widget option
+    update_option('weather_widget_option_zipcode', sanitize_text_field($zipcode));
+
     return $instance;
   }
+
 
   private function to_capitalized_case($string)
   {
