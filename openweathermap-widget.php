@@ -17,7 +17,9 @@ function weather_widget_register_settings()
     'api_key' => '',
     'zipcode' => '',
     'temp' => 'on',
-    'desc' => 'on',
+    'feels_like' => 'on',
+    'summary' => 'on',
+    'desc' => '',
     'humidity' => '',
     'wind_speed' => '',
     'pressure' => '',
@@ -60,7 +62,9 @@ function weather_widget_options_page()
     ],
     'weather' => [
       'title' => 'Weather Options',
-      'temp' => ['Temperature', 'checkbox', 'off'],
+      'temp' => ['Temperature', 'checkbox', 'on'],
+      'feels_like' => ['Feels Like', 'checkbox', 'on'],
+      'summary' => ['Summary', 'checkbox', 'on'],
       'desc' => ['Description', 'checkbox', 'off'],
       'humidity' => ['Humidity', 'checkbox', 'off'],
       'wind_speed' => ['Wind Speed', 'checkbox', 'off'],
@@ -154,6 +158,8 @@ class OpenWeatherMap_Widget extends WP_Widget
     if (!empty($data)) {
       $weather_data = [
         'temp' => ['Temperature', "{$data->main->temp}°F"],
+        'feels_like' => ['Feels Like', "{$data->main->feels_like}°F"],
+        'summary' => ['Summary', $data->weather[0]->main],
         'desc' => ['Description', $data->weather[0]->description],
         'humidity' => ['Humidity', "{$data->main->humidity}%"],
         'wind_speed' => ['Wind Speed', "{$data->wind->speed} m/s"],
