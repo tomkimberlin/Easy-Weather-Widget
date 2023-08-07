@@ -15,6 +15,7 @@ function weather_widget_register_settings()
 {
   $options = [
     'api_key' => '',
+    'country_code' => 'us',
     'zipcode' => '',
     'units' => 'imperial',
     'show_city' => 'on',
@@ -34,10 +35,33 @@ function weather_widget_register_settings()
     $option_name = "weather_widget_option_$name";
     add_option($option_name, sanitize_text_field($default));
     register_setting('weather_widget_options_group', $option_name);
+    sync_settings_to_widget($option_name, $default);
   }
+
+  // Sync widget settings when plugin settings are saved
+  add_action('updated_option', 'sync_settings_to_widget', 10, 3);
+  add_action('add_option', 'sync_settings_to_widget', 10, 2);
 }
 
 add_action('admin_init', 'weather_widget_register_settings');
+
+function sync_settings_to_widget($option_name, $old_value, $value = null)
+{
+  if (strpos($option_name, 'weather_widget_option_') === 0) {
+    $option_value = get_option($option_name);
+    $value = $option_value !== false ? $option_value : $old_value;
+
+    $widgets = get_option('widget_OpenWeatherMap_Widget');
+    if ($widgets) {
+      foreach ($widgets as $index => $widget) {
+        if (is_array($widget)) {
+          $widgets[$index][str_replace('weather_widget_option_', '', $option_name)] = $value;
+        }
+      }
+      update_option('widget_OpenWeatherMap_Widget', $widgets);
+    }
+  }
+}
 
 /**
  * Adds the OpenWeatherMap Widget settings page to the WordPress admin menu.
@@ -59,6 +83,7 @@ function weather_widget_options_page()
     'general' => [
       'title' => 'General Settings',
       'api_key' => ['API Key', 'text', '', 'You can register for a free API key on <a href="http://openweathermap.org/appid" target="_blank">OpenWeatherMap\'s website</a>.'],
+      'country_code' => ['Country Code', 'text', 'us', 'The <a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes">2-letter country code</a>.'],
       'zipcode' => ['ZIP Code', 'text', ''],
       'units' => ['Units of Measurement', 'select', [
         'standard' => 'Standard',
@@ -126,8 +151,8 @@ function weather_widget_options_page()
       // Check if API Key and ZIP code are not empty
       $api_key = get_option('weather_widget_option_api_key');
       $zipcode = get_option('weather_widget_option_zipcode');
-      if (empty($api_key) || empty($zipcode) || !preg_match('/^\d{5}$/', $zipcode)) {
-        echo '<p style="color:red;">API Key and a valid 5-digit ZIP code are required for the widget to function correctly.</p>';
+      if (empty($api_key) || empty($zipcode)) {
+        echo '<p style="color:red;">API Key and a ZIP code are required for the widget to function correctly.</p>';
       }
 
       ?>
@@ -155,8 +180,9 @@ class OpenWeatherMap_Widget extends WP_Widget
    */
   public function widget($args, $instance)
   {
-    $zipcode = get_option('weather_widget_option_zipcode');
     $api_key = get_option('weather_widget_option_api_key');
+    $country_code = get_option('weather_widget_option_country_code');
+    $zipcode = get_option('weather_widget_option_zipcode');
     $units = get_option('weather_widget_option_units');
 
     if (empty($api_key)) {
@@ -175,7 +201,7 @@ class OpenWeatherMap_Widget extends WP_Widget
       return;
     }
 
-    $api_url = "http://api.openweathermap.org/data/2.5/weather?zip={$zipcode}&units={$units}&appid={$api_key}";
+    $api_url = "http://api.openweathermap.org/data/2.5/weather?zip={$zipcode},{$country_code}&units={$units}&appid={$api_key}";
     $response = wp_remote_get($api_url);
 
     if (is_wp_error($response)) {
@@ -264,29 +290,30 @@ class OpenWeatherMap_Widget extends WP_Widget
   public function form($instance)
   {
     $zipcode = !empty($instance['zipcode']) ? $instance['zipcode'] : esc_html__('', 'text_domain');
+    $country_code = !empty($instance['country_code']) ? $instance['country_code'] : esc_html__('', 'text_domain');
   ?>
     <p>
-      <label style="margin:auto;" for="<?php echo esc_attr($this->get_field_id('zipcode')); ?>"><?php esc_attr_e('ZIP Code:', 'text_domain'); ?></label>
+      <label for="<?php echo esc_attr($this->get_field_id('country_code')); ?>"><?php esc_attr_e('Country Code:', 'text_domain'); ?></label>
+      <input class="widefat" id="<?php echo esc_attr($this->get_field_id('country_code')); ?>" name="<?php echo esc_attr($this->get_field_name('country_code')); ?>" type="text" value="<?php echo esc_attr(sanitize_text_field($country_code)); ?>">
+      <small id="countrycode-error" style="color:red; display: none;">Invalid country code. Please enter a 2-letter country code.</small>
+    </p>
+    <p>
+      <label for="<?php echo esc_attr($this->get_field_id('zipcode')); ?>"><?php esc_attr_e('ZIP Code:', 'text_domain'); ?></label>
       <input class="widefat" id="<?php echo esc_attr($this->get_field_id('zipcode')); ?>" name="<?php echo esc_attr($this->get_field_name('zipcode')); ?>" type="text" value="<?php echo esc_attr(sanitize_text_field($zipcode)); ?>">
-      <small id="zipcode-error" style="color:red; display: none;">Invalid ZIP code. Please enter a 5-digit ZIP code.</small>
+      <small id="zipcode-error" style="color:red; display: none;">Invalid ZIP code. Please check your input.</small>
     </p>
 <?php
   }
 
-  /**
-   * Updates the widget settings based on the user input from the settings form.
-   */
   public function update($new_instance, $old_instance)
   {
     $instance = array();
-    $zipcode = (!empty($new_instance['zipcode'])) ? strip_tags($new_instance['zipcode']) : '';
+    $instance['country_code'] = (!empty($new_instance['country_code'])) ? strip_tags($new_instance['country_code']) : '';
+    $instance['zipcode'] = (!empty($new_instance['zipcode'])) ? strip_tags($new_instance['zipcode']) : '';
 
-    if (preg_match('/^\d{5}$/', $zipcode)) {
-      $instance['zipcode'] = $zipcode;
-
-      // Add this to update the widget option
-      update_option('weather_widget_option_zipcode', sanitize_text_field($zipcode));
-    }
+    // Update plugin settings
+    update_option('weather_widget_option_country_code', $instance['country_code']);
+    update_option('weather_widget_option_zipcode', $instance['zipcode']);
 
     return $instance;
   }
