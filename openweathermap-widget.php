@@ -163,7 +163,7 @@ class OpenWeatherMap_Widget extends WP_Widget
         'temp' => ['Temperature', "{$data->main->temp}°F"],
         'feels_like' => ['Feels Like', "{$data->main->feels_like}°F"],
         'summary' => ['Summary', $data->weather[0]->main],
-        'desc' => ['Description', $data->weather[0]->description],
+        'desc' => ['Description', $this->to_capitalized_case($data->weather[0]->description)],
         'humidity' => ['Humidity', "{$data->main->humidity}%"],
         'wind_speed' => ['Wind Speed', "{$data->wind->speed} m/s"],
         'pressure' => ['Pressure', number_format($data->main->pressure) . " hPa"],
@@ -223,6 +223,11 @@ class OpenWeatherMap_Widget extends WP_Widget
     $instance = array();
     $instance['zipcode'] = (!empty($new_instance['zipcode'])) ? strip_tags($new_instance['zipcode']) : '';
     return $instance;
+  }
+
+  private function to_capitalized_case($string)
+  {
+    return ucwords(strtolower($string));
   }
 }
 
