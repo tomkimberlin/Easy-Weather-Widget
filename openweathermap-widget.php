@@ -37,7 +37,6 @@ function weather_widget_register_settings()
   }
 }
 
-
 add_action('admin_init', 'weather_widget_register_settings');
 
 /**
@@ -199,7 +198,7 @@ class OpenWeatherMap_Widget extends WP_Widget
         'temp' => ['Temperature', "{$data->main->temp}$temp_unit"],
         'feels_like' => ['Feels Like', "{$data->main->feels_like}$temp_unit"],
         'summary' => ['Summary', $data->weather[0]->main],
-        'desc' => ['Description', $this->to_capitalized_case($data->weather[0]->description)],
+        'desc' => ['Description', ucwords(strtolower($data->weather[0]->description))],
         'humidity' => ['Humidity', "{$data->main->humidity}%"],
         'wind_speed' => ['Wind Speed', "{$data->wind->speed} $wind_speed_unit"],
         'pressure' => ['Pressure', number_format($data->main->pressure) . " $pressure_unit"],
@@ -263,12 +262,6 @@ class OpenWeatherMap_Widget extends WP_Widget
     update_option('weather_widget_option_zipcode', sanitize_text_field($zipcode));
 
     return $instance;
-  }
-
-
-  private function to_capitalized_case($string)
-  {
-    return ucwords(strtolower($string));
   }
 }
 
