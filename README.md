@@ -8,9 +8,11 @@ Because a picture is worth a thousand words.
 
 ![Widget](/screenshots/widget.png)
 
+![Widget Settings](/screenshots/settings.png)
+
 ## Features
 
-- Display of various weather conditions:
+- Supports the following weather conditions:
   - Weather Icon
   - City Name
   - Summary of the Weather
