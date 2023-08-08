@@ -1,52 +1,56 @@
-# OpenWeatherMap Widget
+# Easy Weather Widget
 
-## Installation
-
-Follow these steps to install the OpenWeatherMap Widget:
-
-1. Download the plugin's PHP file.
-2. Place the PHP file in the wp-content/plugins directory of your WordPress installation.
-3. In the WordPress admin interface, navigate to "Plugins".
-4. Locate "OpenWeatherMap Widget" in the list of plugins and click "Activate".
-
-## Usage
-
-Once installed and activated, configure the OpenWeatherMap Widget using the following steps:
-
-1. Navigate to "Settings" -> "OpenWeatherMap Widget" in the WordPress admin interface.
-2. Configure the settings according to your needs. Be sure to fill in the API Key and ZIP Code, as these fields are mandatory for the widget to function.
-3. Go to "Appearance" -> "Widgets".
-4. Drag and drop the "OpenWeatherMap Widget" into your desired widget area.
-5. The widget should now appear on your site, displaying the weather for the configured ZIP code.
+Easy Weather Widget is a WordPress plugin that fetches and displays weather data from the OpenWeatherMap API. It allows for displaying a variety of weather conditions, including temperature, wind speed, humidity, and precipitation.
 
 ## Screenshots
 
 Because a picture is worth a thousand words.
 
-![Widget](/assets/screenshots/widget.png)
-
-![Widget Settings](/assets/screenshots/settings.png)
+![Widget](/screenshots/widget.png)
 
 ## Features
 
-The OpenWeatherMap Widget allows you to:
+- Display of various weather conditions:
+  - Weather Icon
+  - City Name
+  - Summary of the Weather
+  - Detailed Description
+  - Temperature
+  - Feels Like Temperature
+  - Atmospheric Pressure
+  - Humidity
+  - Minimum and Maximum Temperature
+  - Visibility
+  - Wind Speed
+  - Wind Direction
+  - Gust Speed
+  - Cloudiness Percentage
+  - Rain Volume for the last 1 hour and 3 hours
+  - Snow Volume for the last 1 hour and 3 hours
+- Support for both Imperial and Metric units
+- Ability to round weather data
+- Customizable CSS for styling
 
-1. Display real-time weather data for any ZIP code in a WordPress widget.
-2. Customize the displayed data, including temperature, wind speed, pressure, and more.
-3. Configure units of measurement (Standard, Metric, or Imperial).
-4. Choose to display the city name.
-5. Select from a variety of preconfigured widget styles to customize your interface.
+## Installation
+
+1. Clone the repository to your local machine
+2. Upload the plugin files to your WordPress installation's `/wp-content/plugins/` directory
+3. Activate the plugin through the 'Plugins' screen in your WordPress admin panel
+4. Go to 'Appearance' -> 'Widgets' and drag the 'Easy Weather Widget' to your sidebar
+5. Configure the widget settings as required
+
+## Usage
+
+To use the Easy Weather Widget, you need to provide a ZIP code, country code, and OpenWeatherMap API key in the widget settings. These settings can be accessed through the WordPress admin panel under 'Appearance' -> 'Widgets' -> 'Easy Weather Widget'.
 
 ## Contributing
 
-To contribute to the development of this plugin:
+Contributions are welcome! Here's how you can help:
 
-1. Fork the repository on GitHub.
-2. Clone the forked repository to your machine.
-3. Make your changes and test them on a WordPress instance.
-4. Commit and push your changes to your fork.
-5. Open a pull request.
+- **Report bugs:** If you find a bug, open an issue describing the problem and include steps for reproducing it.
+- **Suggest enhancements:** If you have an idea for a new feature or an improvement to existing functionality, open an issue describing your idea.
+- **Submit pull requests:** If you've fixed a bug or implemented a new feature, send us a pull request. Make sure your code follows the existing style and include tests if applicable.
 
 ## License
 
-The OpenWeatherMap Widget is an open-source project and is licensed under the [MIT license](https://opensource.org/license/mit/). For more details, see the LICENSE file in the project root.
+Easy Weather Widget is licensed under the MIT License. See [LICENSE](LICENSE) for more information.

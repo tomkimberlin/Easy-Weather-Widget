@@ -1,0 +1,17 @@
+.widget_easy_weather_widget {
+  background: #fff;
+  display: inline-flex;
+  align-items: start;
+  flex-direction: column;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-right: auto;
+}
+
+.widget-title {
+  margin-bottom: 1rem;
+}
+
+.weather-info {
+  margin-top: 0;
+}
