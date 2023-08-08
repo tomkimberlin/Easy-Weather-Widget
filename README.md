@@ -8,7 +8,11 @@ Because a picture is worth a thousand words.
 
 ![Widget](/screenshots/widget.png)
 
-![Widget Settings](/screenshots/settings.png)
+![Widget Settings](/screenshots/general-settings.png)
+
+![Widget Settings](/screenshots/weather-settings.png)
+
+![Widget Settings](/screenshots/style-settings.png)
 
 ## Features
 
