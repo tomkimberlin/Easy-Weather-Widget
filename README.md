@@ -49,6 +49,8 @@ Because a picture is worth a thousand words.
 
 To use the Easy Weather Widget, you need to provide a ZIP code, country code, and OpenWeatherMap API key in the widget settings. These settings can be accessed through the WordPress admin panel under 'Appearance' -> 'Widgets' -> 'Easy Weather Widget'.
 
+For those who wish to further customize the appearance of the Easy Weather Widget, custom stylesheets can be added to the `/css/` directory. By doing so, you can override the default styles and ensure the widget aligns perfectly with the aesthetics of your website.
+
 ## Contributing
 
 Contributions are welcome! Here's how you can help:
