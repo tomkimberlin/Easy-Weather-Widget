@@ -35,7 +35,7 @@ The following weather data can be displayed by the widget:
 
 The widget also allows for rounding of the weather data and has the ability to select different CSS files for styling.
 
-For those who wish to further customize the appearance of the Easy Weather Widget, custom stylesheets can be added to the `/css/` directory. By doing so, you can override the default styles and ensure the widget aligns perfectly with the aesthetics of your website.
+To enable more personalization, you can add your own stylesheets to the `/css/` directory. This allows you to further customize the Easy Weather Widget's appearance to better suit the aesthetics of your website.
 
 == Installation ==
 1. Upload the plugin files to the `/wp-content/plugins/` directory, or install the plugin through the WordPress plugins screen directly.
