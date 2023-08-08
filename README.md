@@ -33,11 +33,11 @@ Because a picture is worth a thousand words.
 
 ## Installation
 
-1. Clone the repository to your local machine
-2. Upload the plugin files to your WordPress installation's `/wp-content/plugins/` directory
-3. Activate the plugin through the 'Plugins' screen in your WordPress admin panel
-4. Go to 'Appearance' -> 'Widgets' and drag the 'Easy Weather Widget' to your sidebar
-5. Configure the widget settings as required
+1. Clone the repository to your local machine.
+2. Upload the plugin files to your WordPress installation's `/wp-content/plugins/` directory.
+3. Activate the plugin through the 'Plugins' screen in your WordPress admin panel.
+4. Go to 'Appearance' -> 'Widgets' and drag the 'Easy Weather Widget' to your site.
+5. Configure the widget settings as required.
 
 ## Usage
 
